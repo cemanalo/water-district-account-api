@@ -1,0 +1,13 @@
+.dist
+node_modules
+nodejs
+
+water-district-deps.zip
+.aws-sam
+
+.env
+
+env.json
+env.*.json
+
+.DS_Store

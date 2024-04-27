@@ -1,0 +1,10 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "water-district-account-api-stack"
+resolve_s3 = true
+s3_prefix = "water-district-account-api-stack"
+region = "ap-southeast-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = []

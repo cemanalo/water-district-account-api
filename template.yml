@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  water-district-account-api
+
+Globals:
+  Function:
+    Tags:
+      ENV: !Ref ENV
+      PROJECT: water-district
+      SERVICE: account-api
+    Environment:
+      Variables:
+        ENV: !Ref ENV
+        NODE_TLS_REJECT_UNAUTHORIZED: 0
+    Timeout: 30
+    Runtime: nodejs20.x
+    Architectures:
+      - arm64
+    Layers:
+      - arn:aws:lambda:ap-southeast-1:975050335698:layer:water-district-deps:3
+      - arn:aws:lambda:ap-southeast-1:044395824272:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:11
+
+Parameters:
+  ENV:
+    Type: String
+
+Resources:
+  WaterDistrictAccountApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      ApiKeySourceType: HEADER
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: SHARED
+
+  GetAccountApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .dist/get/
+      Handler: get.handler
+      Events:
+        GetAccounts:
+          Type: Api
+          Properties:
+            Path: /accounts
+            Method: get
+            RestApiId: !Ref WaterDistrictAccountApi
+      Policies:
+      - Statement:
+        - Sid: SSMGetParameterPolicy
+          Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:ap-southeast-1:975050335698:parameter/water-district-db/*
+
+  GetAccountByIdApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .dist/getById/
+      Handler: getById.handler
+      Events:
+        GetAccount:
+          Type: Api
+          Properties:
+            Path: /accounts/{id}
+            Method: get
+            RestApiId: !Ref WaterDistrictAccountApi
+            Auth:
+              ApiKeyRequired: true
+      Policies:
+      - Statement:
+        - Sid: SSMGetParameterPolicy
+          Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:ap-southeast-1:975050335698:parameter/water-district-db/*
+
+  DeleteAccountByIdApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .dist/deleteById/
+      Handler: deleteById.handler
+      Events:
+        DeleteAccount:
+          Type: Api
+          Properties:
+            Path: /accounts/{id}
+            Method: delete
+            RestApiId: !Ref WaterDistrictAccountApi
+            Auth:
+              ApiKeyRequired: true
+      Policies:
+      - Statement:
+        - Sid: SSMGetParameterPolicy
+          Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:ap-southeast-1:975050335698:parameter/water-district-db/*
+
+  PatchAccountByIdApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .dist/patchById/
+      Handler: patchById.handler
+      Events:
+        PatchAccount:
+          Type: Api
+          Properties:
+            Path: /accounts/{id}
+            Method: patch
+            RestApiId: !Ref WaterDistrictAccountApi
+            Auth:
+              ApiKeyRequired: true
+      Policies:
+      - Statement:
+        - Sid: SSMGetParameterPolicy
+          Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:ap-southeast-1:975050335698:parameter/water-district-db/*
+        
+  CreateAccountApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .dist/post/
+      Handler: post.handler
+      Events:
+        CreateAccount:
+          Type: Api
+          Properties:
+            Path: /accounts
+            Method: post
+            RestApiId: !Ref WaterDistrictAccountApi
+            Auth:
+              ApiKeyRequired: true
+      Policies:
+      - Statement:
+        - Sid: SSMGetParameterPolicy
+          Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource: arn:aws:ssm:ap-southeast-1:975050335698:parameter/water-district-db/*
