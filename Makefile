@@ -1,6 +1,6 @@
 _packDepsLayer:
 	rm -rf nodejs
-	rm -f water-billing-deps.zip
+	rm -f water-district-deps.zip
 	mkdir nodejs
 	cp package.json package-lock.json nodejs
 	cd nodejs && npm install --omit=dev
